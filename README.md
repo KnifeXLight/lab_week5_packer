@@ -1,8 +1,31 @@
-In this lab we need to modify the file 'wk5-Packer-intro-lab-start'.
+# ACIT 4640 - Lab 5 - Packer
 
-First we changed the build block.
-Here we set the buildname to be web-nginx, and grabbed the source name from the above source block.
-```
+Member:
+- Charley Liao
+- Jean Venter
+
+---
+
+
+In this lab, we are to modify the packer configuration file `web-front.pkr.hcl` to create a webserver on `nginx` platform.
+
+## Repository Contents
+
+- `web-front.pkr.hcl`: The packer template
+- `files/`: Contains static website (`index.html`) and Nginx conig (`nginx.conf`)
+- `scripts/`: Script to install Nginx and apploy configs.
+
+## Configuations
+The `web-front.pkr.hcl` had missing blocks to configure the image. Below discribes the boxes and how it works.
+
+### 1. Source Configuration
+- **Base Image**: Uses latest Debian AMI
+- **Instance Type**: `t3.micro` and tombstone information for EC2 isntance for AWS
+
+For the lab we first changed the source config block.
+- Defined the source above
+
+```bash
 build {
   name = "web-nginx"
   sources = [
@@ -11,48 +34,80 @@ build {
   ]
 ```
 
-Next we changed the provisioners shell block. These commands will be run after the instance is created.
-Here we made the correct directory and allowed ownership for the base user. And we made a temporary working directory at the end.
-```
+### 2. Build Process & Provisioners
+These block specifics sequennce and provisioners:
+1. **Inline Shell**
+  - Creates custom web root `/web/html` (req. by `nginx.conf`)
+  - Creates staginng directory `/tmp/web` (set-up scripts)
+  - Sets `admin` user ownership without `sudo`
+
+Here we changed the provisioners shell block. These commands will be run after the instance is created.
+
+```bash
   provisioner "shell" {
     inline = [
       "echo creating directories",
       "sudo mkdir -p /var/www/html",
       "sudo chown -R admin:admin /var/www/html",
-      # COMPLETE ME add inline scripts to create necessary directories and change directory ownership.
-      # See nginx.conf file for root directory where files will be served.
-      # Files need appropriate ownership for default user
       "mkdir -p /tmp/web"
     ]
   }
 ```
 
-Next we changed the first provisioner block to add the HTML file to our instance.
-```
+2. **File Uploads**
+  - `files/index.html` goes into `/web/html/index.html` (Find web root)
+  - `files/nginx.conf` goes into `/tmp/web/nginx.conf` (Staging area for script)
+
+Changed the **_Upload HTML_** provisioner block to add the HTML file to our instance.
+
+```bash
   provisioner "file" {
       source = "files/index.html"
       destination = "/var/www/html/index.html"
-    # COMPLETE ME add the HTML file to your image
   }
 ```
 
-Then we changed the second provisioner block to add the nginx file to our instance.
-```
+Added the **_Upload Configuration_** provisioner block to add the nginx file to our instance.
+
+```bash
   provisioner "file" {
       source = "files/nginx.conf"
       destination = "/tmp/nginx.conf"
-    # COMPLETE ME add the nginx.conf file to your image
   }
 ```
 
-Lastly we added an additional script to install and setup nginx.
-```
+
+3. **Shell Scripts**
+  - Run `install-nginx` and `setup-nginx` in the `/scripts` file
+
+Added the privisoner scripts to install and setup nginx.
+
+```bash
   provisioner "shell" {
       scripts = [
           "scripts/install-nginx",
           "scripts/setup-nginx"
       ]
   }
-  # COMPLETE ME add additional provisioners to run shell scripts and complete any other tasks
-}
 ```
+
+### 3. Usage Instructions
+
+1. **Initialize Packer**
+```bash
+packer init .
+```
+2. **Validate**
+
+```bash
+packer validate web-front.pkr.hcl
+```
+
+3. **Build**
+```bash
+packer build web-front.pkr.hcl
+```
+
+### Screenshot
+
+![alt text](Lab_5_Web_Success.png)
