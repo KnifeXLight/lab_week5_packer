@@ -11,7 +11,7 @@ packer {
 # https://developer.hashicorp.com/packer/docs/templates/hcl_templates/blocks/source
 source "amazon-ebs" "debian" {
   ami_name      = "web-nginx-aws"
-  instance_type = "t2.micro"
+  instance_type = "t3.micro"
   region        = "us-west-2"
   source_ami_filter {
     filters = {
@@ -53,14 +53,16 @@ build {
 
   provisioner "file" {
       source = "files/nginx.conf"
-      desitnation = "/tmp/nginx.conf"
+      destination = "/tmp/nginx.conf"
     # COMPLETE ME add the nginx.conf file to your image
   }
 
   provisioner "shell" {
       scripts = [
-          "scripts/install-nginx.sh",
-          "scripts/setup-nginx.sh"
+          "scripts/install-nginx",
+          "scripts/setup-nginx"
+      ]
+  }
   # COMPLETE ME add additional provisioners to run shell scripts and complete any other tasks
 }
 
