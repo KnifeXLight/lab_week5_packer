@@ -38,10 +38,11 @@ build {
     inline = [
       "echo creating directories",
       "sudo mkdir -p /var/www/html",
-      "sudo chown -R admin:admin /var/www/html"
+      "sudo chown -R admin:admin /var/www/html",
       # COMPLETE ME add inline scripts to create necessary directories and change directory ownership.
       # See nginx.conf file for root directory where files will be served.
       # Files need appropriate ownership for default user
+      "mkdir -p /tmp/web"
     ]
   }
 
@@ -53,7 +54,7 @@ build {
 
   provisioner "file" {
       source = "files/nginx.conf"
-      destination = "/tmp/nginx.conf"
+      destination = "/tmp/web/nginx.conf"
     # COMPLETE ME add the nginx.conf file to your image
   }
 
