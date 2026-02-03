@@ -29,6 +29,7 @@ source "amazon-ebs" "debian" {
 build {
   name = "web-nginx"
   sources = [
+      "source.amazon-ebs.debian"
     # COMPLETE ME Use the source defined above
   ]
   
@@ -36,6 +37,8 @@ build {
   provisioner "shell" {
     inline = [
       "echo creating directories",
+      "sudo mkdir -p /var/www/html",
+      "sudo chown -R admin:admin /var/www/html"
       # COMPLETE ME add inline scripts to create necessary directories and change directory ownership.
       # See nginx.conf file for root directory where files will be served.
       # Files need appropriate ownership for default user
@@ -43,13 +46,21 @@ build {
   }
 
   provisioner "file" {
+      source = "files/index.html"
+      destination = "/var/www/html/index.html"
     # COMPLETE ME add the HTML file to your image
   }
 
   provisioner "file" {
+      source = "files/nginx.conf"
+      desitnation = "/tmp/nginx.conf"
     # COMPLETE ME add the nginx.conf file to your image
   }
 
+  provisioner "shell" {
+      scripts = [
+          "scripts/install-nginx.sh",
+          "scripts/setup-nginx.sh"
   # COMPLETE ME add additional provisioners to run shell scripts and complete any other tasks
 }
 
