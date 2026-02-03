@@ -37,8 +37,9 @@ build {
   provisioner "shell" {
     inline = [
       "echo creating directories",
-      "sudo mkdir -p /var/www/html",
-      "sudo chown -R admin:admin /var/www/html",
+      "sudo mkdir -p /web/html",
+      "sudo chown -R admin:admin /web/html",
+      "sudo chmod 775 /web/html",
       # COMPLETE ME add inline scripts to create necessary directories and change directory ownership.
       # See nginx.conf file for root directory where files will be served.
       # Files need appropriate ownership for default user
@@ -48,7 +49,7 @@ build {
 
   provisioner "file" {
       source = "files/index.html"
-      destination = "/var/www/html/index.html"
+      destination = "/web/html/index.html"
     # COMPLETE ME add the HTML file to your image
   }
 
