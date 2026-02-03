@@ -30,7 +30,6 @@ build {
   name = "web-nginx"
   sources = [
       "source.amazon-ebs.debian"
-    # COMPLETE ME Use the source defined above
   ]
 ```
 
@@ -47,8 +46,9 @@ Here we changed the provisioners shell block. These commands will be run after t
   provisioner "shell" {
     inline = [
       "echo creating directories",
-      "sudo mkdir -p /var/www/html",
-      "sudo chown -R admin:admin /var/www/html",
+      "sudo mkdir -p /web/html",
+      "sudo chown -R admin:admin /web/html",
+      "sudo chmod 775 /web/html",
       "mkdir -p /tmp/web"
     ]
   }
@@ -63,7 +63,7 @@ Changed the **_Upload HTML_** provisioner block to add the HTML file to our inst
 ```bash
   provisioner "file" {
       source = "files/index.html"
-      destination = "/var/www/html/index.html"
+      destination = "/web/html/index.html"
   }
 ```
 
@@ -72,7 +72,7 @@ Added the **_Upload Configuration_** provisioner block to add the nginx file to 
 ```bash
   provisioner "file" {
       source = "files/nginx.conf"
-      destination = "/tmp/nginx.conf"
+      destination = "/tmp/web/nginx.conf"
   }
 ```
 
